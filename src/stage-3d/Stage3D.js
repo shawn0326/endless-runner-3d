@@ -7,6 +7,7 @@ import Renderer from "./Renderer.js";
 import SkyPlane from "./SkyPlane.js";
 import Road from "./Road.js";
 import Player from "./Player.js";
+import Items from "./Items.js";
 
 const { CAMERA_FOV, CAMERA_IDLE_POSITION } = GameConfig;
 
@@ -91,8 +92,13 @@ export default class Stage3D {
     player.pose();
     this.scene.add(player);
 
+    // Items
+    const items = new Items(resources);
+    this.scene.add(items);
+
     this.road = road;
     this.player = player;
+    this.items = items;
   }
 
   _initLights() {
@@ -106,8 +112,15 @@ export default class Stage3D {
   }
 
   _loop(deltaTime) {
-    if (this.road) {
-      this.road.scroll(deltaTime * 0.01);
-    }
+    if (!this._resources.loaded) return;
+
+    const translate = deltaTime * 0.01;
+
+    this.road.scroll(translate);
+
+    this.items.emit(deltaTime);
+    this.items.scroll(translate);
+
+    this.items.collide(this.player);
   }
 }

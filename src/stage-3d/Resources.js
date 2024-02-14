@@ -19,15 +19,24 @@ export default class Resources {
     ];
 
     this._map = new Map();
+
+    this._loaded = false;
   }
 
   load() {
     const promises = this.tasks.map((task) => this._loadTask(task));
-    return Promise.all(promises).then(() => this._map);
+    return Promise.all(promises).then(() => {
+      this._loaded = true;
+      return this._map;
+    });
   }
 
   get(name) {
     return this._map.get(name);
+  }
+
+  get loaded() {
+    return this._loaded;
   }
 
   _loadTask(task) {
